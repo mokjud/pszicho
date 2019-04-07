@@ -1,0 +1,263 @@
+---
+title: "cirjak_ildiko"
+author: "mokos judit"
+#date: "06/04/2019"
+output: word_document
+chunk_output_type: console
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+### Cirják Ildikó ###
+### ildikocirjak@gmail.com ###
+##########################
+
+
+library(dplyr)
+library(knitr)
+library(ggplot2)
+### DATA ####
+data <- read.csv("/Users/mokosjudit/Dropbox/stat/czirjak_ildiko/diak_kerdoivek.csv")
+
+#str(data)
+
+## skalak kiszamolasa
+komp <- c("komp_szovegertes_tanulas", "komp_szamolasi_keszseg", "komp_fizikai_eronlet", "komp_empatia", "komp_stressztures", "komp_kezugyesseg", "komp_kreativitas", "komp_kommunkacios_kepesseg", "komp_emlekezet", "komp_terbeli_gondolkodas", "komp_figyelem")
+
+komp2 <- c("szövegértés és tanulás", "számolási készség", "fizikai erőnlét", "empátia", "stressztűrés", "kézügyesség", "kreativitás", "kommunikációs képesség", "emlékezet", "térbeli gondolkodás", "figyelem")
+data$komp_szovegertes_tanulas <- data$Kompetencia1 + data$Kompetencia12+ data$Kompetencia23+ data$Kompetencia34
+data$komp_szamolasi_keszseg <-  data$Kompetencia2+ data$Kompetencia13 +data$Kompetencia24 + data$Kompetencia35
+data$komp_fizikai_eronlet <- data$Kompetencia3+ data$Kompetencia14 + data$Kompetencia25 + data$Kompetencia36
+data$komp_empatia <- data$Kompetencia4 + data$Kompetencia15 + data$Kompetencia26 + data$Kompetencia37
+data$komp_stressztures <- data$Kompetencia5 + data$Kompetencia16 + data$Kompetencia27 +data$Kompetencia38
+data$komp_kezugyesseg <- data$Kompetencia6 +data$Kompetencia17 +data$Kompetencia28 +data$Kompetencia39
+data$komp_kreativitas <-  data$Kompetencia7 +data$Kompetencia29 +data$Kompetencia40
+data$komp_kommunkacios_kepesseg <- data$Kompetencia8 + data$Kompetencia19 
+data$komp_emlekezet <- data$Kompetencia9 +data$Kompetencia20 + data$Kompetencia31 
+data$komp_terbeli_gondolkodas <-  data$Kompetencia10 + data$Kompetencia21
+data$komp_figyelem <- data$Kompetencia11 + data$Kompetencia44
+
+erd <- c("erd_targyias", "erd_elemzo", "erd_alkoto", "erd_kozossegi", "erd_iranyito", "erd_megvalosithato")
+erd2 <- c("tárgyias", "elemző", "alkotó", "közösségi", "irányító", "megvalósítható")
+data$erd_targyias <- data$erdeklodes1 +data$erdeklodes7 +data$erdeklodes11
+data$erd_elemzo <- data$erdeklodes2 + data$erdeklodes12 + data$erdeklodes14
+data$erd_alkoto <-  data$erdeklodes3 + data$erdeklodes8 + data$erdeklodes15
+data$erd_kozossegi <- data$erdeklodes4 + data$erdeklodes9 + data$erdeklodes16
+data$erd_iranyito <-  data$erdeklodes5 +data$erdeklodes10 + data$erdeklodes17
+data$erd_megvalosithato <-  data$erdeklodes6+ data$erdeklodes13+ data$erdeklodes18
+
+data$don <- data$donteskep1 + (2-data$donteskep2) + (2-data$donteskep3) + data$donteskep4 + (2-data$donteskep5) + data$donteskep6 + data$donteskep7 +
+            (2-data$donteskep8) + (2-data$donteskep9)
+
+cfi <- c("cfi_stressztures", "cfi_aggodalom", "cfi_donteshozatal", "cfi_hatarozottsag")
+cfi2 <- c("stressztűrés", "aggodalom", "döntéshozatal", "határozottság")
+data$cfi_stressztures <- data$CFI1 + (6-data$CFI2) + data$CFI3
+data$cfi_aggodalom <-  data$CFI4 + data$CFI5 + data$CFI6
+data$cfi_donteshozatal <-  data$CFI7 + (6-data$CFI8) + data$CFI9 +data$CFI10 +data$CFI11
+data$cfi_hatarozottsag <- data$CFI12 + data$CFI13 + data$CFI14 + data$CFI15 + data$CFI16 +data$CFI17
+tehetseg <- filter(data, ISKOLA==1)
+sport <- filter(data, ISKOLA==2)
+
+```
+
+Az alábbi dokumentum a következőket tartalmazza: a hipotéziseid, az elvégzett statisztika neve és eredménye, az eredmény tudományos nyelven, az eredmény emberi nyelven. A használt statisztikai módszerek megértéshez segítséget a kisokosban találsz.  
+Az értékek végig kettő tizedesjegy pontossággal vannak kiírva. Emiatt, ha valahol nullát látsz, akkor az így értelmezendő: kisebb, mint 0.001
+
+A dolgozatod módszertani részéhez ezt kell írnod:  
+_A statisztikai számolások kivitelezéséhez és az ábra elkészítéséhez R programnyelvet használtunk._  
+
+#Összefoglaló  
+Az alábbi négy skála alskáláit tekintve egyszer mutatkozik szignifikáns különbség a sport és a tehetséggondozó iskolába járó diákok között, ez pedig a kompetencia skála fizikai erőnlét alskálája, ahol a sport iskolások átlagosan magasabb pontszámot kapnak, mint a tehetséggondozó iskolások. Ezen kívül a két iskolába járó diákok pontszáma mindenhol megegyezik.  
+
+
+#1. hipotézis. van-e különbség a két iskolatípust tekintve a kompetencia kérdőív 10 alskálájára kapott pontszámokban ( szövegértés és tanulás, számolási készség, fizikai erőnlét, empátia, stressztűrés, kézügyesség, kreativitás, kommunikációs képesség, emlékezet, térbeli gondolkodás, figyelem)
+Azaz: van-e különbség a két iskolatípusba járó gyerekek átlagos pontszáma között az adott skálán?
+
+**Használt statisztikai eszköz:** Mann-Whitney-féle U teszt  
+Minden alskálánál külön megnéztem azt, hogy van-e különbség a sportos és a tehetséggondozós gyerekek pontszámainak átlaga között. Tehát, minden alskálára külön elvégeztem egy Mann-Whitney-féle U tesztet. Az U tesztnek eredményként két értéket ad. A W érték számodra nem hordoz információt, de lehet, hogy a szakdogádban kérik. A p érték mondja meg, hogy a két csoport között van-e szignifikáns különbség. Ha a p érték kisebb, mint 0.05, akkor a két csoport szignifikánsan különbözik egymástól az adott változót nézve. Ha a p érték nagyobb, mint 0.05, akkor a két csoport között nincsen különbség.  
+A tesztet eredményét a következő táblázatban foglaltam össze.  
+
+**Eredmény: **  
+A táblázat harmadik oszlopa mondja meg, hogy van-e szignifikáns különbség a sportoló és a tehetséggondozó gyerekek pontszáma között az adott aslkálán. Ha a p érték nagyobb, mint 0.05, mint példul a első sorban, a szövegértés és tanulásnál, akkor nincsen különbség a két csoport között. Ha a p érték kisebb, mint 0.05, akkor van különbség a két csoport között, mint például a táblázat 3. sorában, a fizikai erőnlétet tekintve.  
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+
+result <- list()
+result.df <- data.frame(valtozo = NA, W = NA, p = NA)
+counter=0
+for(i in komp)
+{
+  x <- which(colnames(data)==as.character(i))
+  result[[i]] <-  wilcox.test(tehetseg[,x], sport[,x])
+  counter= counter+1
+  result.df[counter,] <- c(i, result[[i]]$statistic, round(result[[i]]$p.value,2))
+}
+result.df$valtozo <- komp2
+
+kable(result.df, col.names=c("változó", "W érték", "p érték"))
+
+```
+
+Szignifikáns különbség van a csoportok között az alábbi askálá(k)nál: `r result.df[which(result.df$p<0.06), 1]`
+
+A szignifikáns különbség jobb megértéséhez lásd a következő ábrát: figure_komp_fizikai_eronlet.png  
+Ezt az ábratípust boxplotnak hívják, az értelmezéséhez találsz segítséget a kisokosban.  
+Az ábráról leolvasható, hogy a sport iskolába járó gyerekek a fizikai erőnlét alskálán magasabb pontszámot értek el , mint a tehetséggondozó iskolába járó gyerekek.  
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+figure1 <- ggplot(data, aes(y=komp_fizikai_eronlet, x=as.factor(ISKOLA)))+
+  geom_boxplot()+
+  theme_minimal()+
+  scale_x_discrete(name="iskolatípus", labels=c("tehetséggondozó", "sport"))+
+  scale_y_continuous(name="Fizikai erőnlét")+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=15),
+        legend.text=element_text(size=15),
+        legend.title=element_text(size=15))
+print(figure1)
+ggsave("/Users/mokosjudit/Dropbox/stat/czirjak_ildiko/figure_komp_fizikai_eronlet.png", figure1)
+
+```
+
+
+#2. hipotézis. van-e különbség a két iskolatípust tekintve az érdeklődési irányok kérdőívé 6 darab alskálájára kapott pontszámok között (tárgyias, elemző, alkotó, közösségi, irányító, megvalósító)
+Azaz: van-e különbség a két iskolatípusba járó gyerekek átlagos pontszáma között az adott skálán?
+
+**Használt statisztikai eszköz:** Mann-Whitney-féle U teszt  
+Csak úgy, mint az előző hipotézisednél, itt is minden alskálánál külön megnéztem azt, hogy van-e különbség a sportos és a tehetséggondozós gyerekek pontszámainak átlaga között. Tehát, minden alskálára külön elvégeztem egy Mann-Whitney-féle U tesztet. 
+A tesztet eredményét a következő táblázatban foglaltam össze.  
+
+**Eredmény: **  
+A táblázatot ugyanúgy kell értelmezni, mint az előző hipotézisnél. 
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+
+result <- list()
+result.df <- data.frame(valtozo = NA, W = NA, p = NA)
+counter=0
+for(i in erd)
+{
+  x <- which(colnames(data)==as.character(i))
+  result[[i]] <-  wilcox.test(tehetseg[,x], sport[,x])
+  counter= counter+1
+  result.df[counter,] <- c(i, result[[i]]$statistic, round(result[[i]]$p.value,2))
+}
+result.df$valtozo <- erd2
+
+kable(result.df, col.names=c("változó", "W érték", "p érték"))
+
+```
+
+Egyik alksálánál sincsen szignifikáns különbség a két csoport között.  
+
+#3. hipotézis. van-e különbség a két iskolatípust tekintve a döntésképtelenségre kapott pontszámokban
+Azaz: van-e különbség a két iskolatípusba járó gyerekek átlagos pontszáma között?
+
+**Használt statisztikai eszköz:** Mann-Whitney-féle U teszt. 
+
+**Eredmény: **  
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+result <- wilcox.test(tehetseg$don, sport$don)
+```
+W érték: `r round(result$statistic, 2)`  
+p érték: `r round(result$p.value, 2)`
+Azaz: nincsen szignifikáns különbség a döntéshozatal tekintetében a két csoport között.  
+
+#4. hipotézis. van-e különbség a career factors inventory kérdőív alskáláiban?
+Azaz: van-e különbség a két iskolatípusba járó gyerekek átlagos pontszáma között?
+
+**Használt statisztikai eszköz:** Mann-Whitney-féle U teszt  
+Csak úgy, mint az első hipotézisednél, itt is minden alskálánál külön megnéztem azt, hogy van-e különbség a sportos és a tehetséggondozós gyerekek pontszámainak átlaga között. Tehát, minden alskálára külön elvégeztem egy Mann-Whitney-féle U tesztet. 
+A tesztet eredményét a következő táblázatban foglaltam össze.  
+
+**Eredmény: **  
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+
+result <- list()
+result.df <- data.frame(valtozo = NA, W = NA, p = NA)
+counter=0
+for(i in cfi)
+{
+  x <- which(colnames(data)==as.character(i))
+  result[[i]] <-  wilcox.test(tehetseg[,x], sport[,x])
+  counter= counter+1
+  result.df[counter,] <- c(i, result[[i]]$statistic, round(result[[i]]$p.value,2))
+}
+result.df$valtozo <- cfi2
+
+kable(result.df, col.names=c("változó", "W érték", "p érték"))
+
+```
+
+Azaz: a p érték sehol sem kisebb, mint 0.05, tehát sehol nincsen szignifikáns különbség a két iskolába járó gyerekek között. 
+
+#5. hipotézis. van-e kapcsolat a szülők végzettsége és a gyerekek hobbija között, illetve a szülők végzettsége és a gyerekek szakköre között? 
+Azaz: van-e valamilyen összefüggés a szülők végzettsége és aközött, hogy a gyerek milyen hobbit választ?  
+
+
+**Használt statisztikai eszköz:** Khi-négyzet teszt függetlenség vizsgálatra  
+Ez a teszt azt nézi, hogy van-e összefüggés két olyan változó (pl a végzettség és a hobbi között), ami nem szám, hanem valamilyen csoport (pl, a végzettség lehet általános iskola, egyetem, stb, ami nem szám).  
+Eredményként itt is a p értéket kell nézni, de megadok olyan értékeket, amik bár számodra nem hordoznak fontos információt, de lehet, hogy kérik a szakdolgozatodban.  
+
+**Eredmény: **  
+Ezt a kérdést akkor lehetne vizsgálni, ha nagyobb lenne az elemszámod, azaz, ha több gyereket tudtál volna megkérdezni. A khi-négyzet teszt elsőnek megszámolja, hogy hány olyan gyerek van, akinek a hobbija X, az anyja végzettsége Y. Ha van olyan kategória, ahová nem esik gyerek, vagy kevesebb, mint 5 gyerek esik, akkor nem tud megbízható eredményt adni. Ahogy az a következő táblázatnál látod, nálad ez többször is megesik. A táblázatban azt látod, hogy hány gyerek esik az adott kategóriába. Láthatod, hogy nincsen olyan gyerek például, akinek az anyukája 1-es végzettségű, és akinek a hobbija 1-es.  
+Ilyen esetben azt szokás leírni, hogy vizsgáltad, hogy van-e összefüggés a szülők végzettsége és a gyerek hobbi/szakkör választása között, azonban az alacsony elemszám miatt nem lehet a khi-négyzet tesztet elvégezni, így sajnos nem tudjuk, hogy van-e összefüggés.  
+
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+kont.table <- as.matrix(with(data, (table(anyaisk, hobbi))))
+#kable(kont.table)
+```
+
+#Leíró statisztika
+
+Sport iskolába járó gyerekek adatai:  
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+
+df <- data.frame(valtozo=NA, minimum=NA, maximum=NA, atlag=NA, szoras=NA)
+valtozok <- c(komp, erd, cfi, "don")
+valtozok2 <- c(komp2, erd2, cfi2, "döntésképtelenség")
+counter=0
+for(i in valtozok)
+{
+  counter= counter+1
+  x <- which(colnames(data)==as.character(i))
+  min1 <- min(sport[,x])
+  max1 <- max(sport[,x])
+  atlag <- mean(sport[,x])
+  szoras <- sd(sport[,x])
+  df[counter, ] <- c(i, min1, max1, round(atlag,2), round(szoras,2))
+
+}
+
+df$valtozo <- valtozok2
+kable(df, col.names=c("alskála", "minimum", "maximum", "átlag", "szórás"))
+
+```
+
+Tehetséggondozó iskolába járó gyerekek adatai: 
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, warning=F}
+
+df <- data.frame(valtozo=NA, minimum=NA, maximum=NA, atlag=NA, szoras=NA)
+valtozok <- c(komp, erd, cfi, "don")
+valtozok2 <- c(komp2, erd2, cfi2, "döntésképtelenség")
+counter=0
+for(i in valtozok)
+{
+  counter= counter+1
+  x <- which(colnames(data)==as.character(i))
+  min1 <- min(tehetseg[,x])
+  max1 <- max(tehetseg[,x])
+  atlag <- mean(tehetseg[,x])
+  szoras <- sd(tehetseg[,x])
+  df[counter, ] <- c(i, min1, max1, round(atlag,2), round(szoras,2))
+
+}
+
+df$valtozo <- valtozok2
+kable(df, col.names=c("alskála", "minimum", "maximum", "átlag", "szórás"))
+
+```
+
